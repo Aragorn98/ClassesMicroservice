@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.bind.annotation.RestController;
 
 
+import javax.naming.NameNotFoundException;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/classes")
 public class ClassesController {
-
+    @Autowired
     private ClassesRepository classesRepository;
     private PaginationDao paginationDao;
     @Autowired
@@ -40,8 +41,18 @@ public class ClassesController {
         PaginationService paginationService = new PaginationService(paginationDao);
         return getDetailedClassById(
                 paginationService.findJsonDataByCondition(orderBy, direction, page, size));
+    }
 
 
+    @GetMapping("/classID/{id}")
+    public Classes getClassById(@PathVariable("id") long id) throws NameNotFoundException {
+        Classes classes = classesRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
+        if (classes != null) {
+            return classes;
+        }
+        throw new NameNotFoundException(
+                "Class '" + id + "' not found");
     }
 
     @GetMapping("/psOrderBy")
@@ -74,8 +85,10 @@ public class ClassesController {
             String groupName = restTemplate.getForObject(
                     "http://groups/group/groupName/{groupId}", String.class, groupId
             );
-            classesNew.add(new ClassesDetailed(className, teacherName, groupName));
+            classesNew.add(new ClassesDetailed(classes1.getId(), className, teacherName, groupName));
         });
+        classesNew.forEach(s ->
+                System.out.println(s.getId()));
         return classesNew;
     }
 
@@ -86,9 +99,12 @@ public class ClassesController {
 
     @PutMapping("/classes/update/{id}")
     public void updateClass(@PathVariable long id, @RequestBody Classes classes) {
+        System.out.println("argyn"+id);
         if (classes.getId() != id) {
             throw new IllegalStateException("Given class's ID doesn't match the ID in the path.");
         }
+//        classes.setTeacherId(new Long(2));
+//        classes.setGroupId(new Long(2));
         classesRepository.save(classes);
     }
 

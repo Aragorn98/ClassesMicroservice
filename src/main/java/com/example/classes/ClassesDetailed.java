@@ -1,11 +1,13 @@
 package com.example.classes;
 
 public class ClassesDetailed {
+    private Long id;
     private String className;
     private String teacherName;
     private String groupName;
 
-    public ClassesDetailed(String className, String teacherName, String groupName) {
+    public ClassesDetailed(Long id, String className, String teacherName, String groupName) {
+        this.id = id;
         this.className = className;
         this.teacherName = teacherName;
         this.groupName = groupName;
@@ -33,5 +35,13 @@ public class ClassesDetailed {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
