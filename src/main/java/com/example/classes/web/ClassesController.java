@@ -28,6 +28,10 @@ public class ClassesController {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    TeacherService teacherService;
+    @Autowired
+    GroupService groupService;
 
     @Autowired
     public ClassesController(ClassesRepository classesRepository, PaginationDao paginationDao) {
@@ -72,6 +76,10 @@ public class ClassesController {
         return getDetailedClassById(classesRepository.findAllByName(searchText));
     }
 
+
+
+
+
     private ArrayList<ClassesDetailed> getDetailedClassById(Iterable<Classes> classes) {
         ArrayList<ClassesDetailed> classesNew = new ArrayList<>();
         classes.forEach(classes1 -> {
@@ -79,18 +87,19 @@ public class ClassesController {
             System.out.println(classes1);
             long teacherId = classes1.getTeacherId();
             long groupId = classes1.getGroupId();
-            String teacherName = restTemplate.getForObject(
-                    "http://teachers/teachers/teacherName/{teacherId}", String.class, teacherId
-            );
-            String groupName = restTemplate.getForObject(
-                    "http://groups/group/groupName/{groupId}", String.class, groupId
-            );
+            String teacherName = teacherService.getTeacherNameById(teacherId);
+            String groupName = groupService.getGroupNameById(groupId);
             classesNew.add(new ClassesDetailed(classes1.getId(), className, teacherName, groupName));
         });
         classesNew.forEach(s ->
                 System.out.println(s.getId()));
         return classesNew;
     }
+
+
+
+
+
 
     @PostMapping("/classes/add")
     public Classes saveClass(@RequestBody @Valid Classes classes) {
