@@ -20,7 +20,7 @@ import java.util.List;
 //tag::baseClass[]
 
 @RestController
-@RequestMapping("/classes")
+//@RequestMapping("/classes")
 public class ClassesController {
     @Autowired
     private ClassesRepository classesRepository;

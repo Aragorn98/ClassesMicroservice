@@ -3,7 +3,11 @@ package com.example.classes.web;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,9 +30,19 @@ public class TeacherService {
 
 
     public String  getTeacherNameById(long teacherId) {
-        return restTemplate.getForObject(
-                "http://teachers/teachers/teacherName/{teacherId}", String.class, teacherId
-        );
+
+        String apiCredentials = "rest-client:p@ssword";
+        String base64Credentials = new String(Base64.encodeBase64(apiCredentials.getBytes()));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Basic " + base64Credentials);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+//        return restTemplate.getForObject(
+//                "http://teachers/teachers/teacherName/{teacherId}", String.class, teacherId
+//        );
+        return restTemplate.exchange("http://teachers/teachers/teacherName/" + teacherId,
+                HttpMethod.GET, entity, String.class).getBody();
     }
 
     public String  getTeacherNameByIdFallback(long teacherId) {
